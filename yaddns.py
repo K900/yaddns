@@ -12,15 +12,14 @@ def main(domain, subdomain, token):
     ip_address = requests.get('https://api.ipify.org').text
     print('Your public facing IP address is', ip_address)
 
+    def pdd_call(method, url, params):
+        return method(PDD_BASE + url, params, headers={'PddToken': token}).json()
+
     def pdd_get(url, params):
-        return requests.get(PDD_BASE + url, params, headers={
-            'PddToken': token
-        }).json()
+        return pdd_call(requests.get, url, params)
 
     def pdd_post(url, params):
-        return requests.post(PDD_BASE + url, params, headers={
-            'PddToken': token
-        }).json()
+        return pdd_call(requests.post, url, params)
 
     for record in pdd_get('/api2/admin/dns/list', {'domain': domain})['records']:
         if record['type'] == 'A' and record['subdomain'] == subdomain:
